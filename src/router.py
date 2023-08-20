@@ -1,8 +1,6 @@
 from fastapi import Depends, APIRouter
 from fastapi.security import HTTPBearer
 
-from src.auth.dependencies import get_current_user
-
 from src.auth.router import router as auth_router
 from src.developer.router import router as developer_router
 from src.manager.router import router as manager_router
@@ -29,6 +27,28 @@ router.include_router(
     auth_router,
     prefix="/auth",
     tags=["auth"],
+)
+
+router.include_router(
+    developer_router,
+    prefix="/developer",
+    tags=["developer"],
+    # Removed global dependency to allow public routes
+)
+
+router.include_router(
+    manager_router,
+    prefix="/manager",
+    tags=["manager"],
+    # Manager router internally handles permissions, but we can also add it here if we want strict module level
+    # Keeping it internal is fine.
+)
+
+router.include_router(
+    resource_router,
+    prefix="/resource",
+    tags=["resource"],
+    dependencies=[Depends(token_auth_scheme)], # Resource routes need at least a valid token
 )
 
 router.include_router(

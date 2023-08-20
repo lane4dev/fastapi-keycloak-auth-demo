@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from fastapi import APIRouter, Depends, HTTPException, status, Body
+from fastapi import APIRouter, Depends, HTTPException, status
 
 from src.auth.dependencies import get_current_user, RoleChecker
 
