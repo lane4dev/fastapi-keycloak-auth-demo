@@ -1,0 +1,13 @@
+[project]
+name = "fastapi-keycloak-auth"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "fastapi>=0.101.1",
+    "itsdangerous>=2.2.0",
+    "pydantic-settings>=2.0.3",
+    "python-keycloak>=3.3.0",
+    "uvicorn>=0.38.0",
+]
