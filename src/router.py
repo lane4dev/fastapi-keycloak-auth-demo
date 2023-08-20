@@ -23,3 +23,24 @@ async def index():
         Dict
     """
     return {"status": "ok"}
+
+
+router.include_router(
+    auth_router,
+    prefix="/auth",
+    tags=["auth"],
+)
+
+router.include_router(
+    user_router,
+    prefix="/user",
+    tags=["user"],
+    dependencies=[Depends(token_auth_scheme)], # User routes need at least a valid token
+)
+
+router.include_router(
+    admin_router,
+    prefix="/admin",
+    tags=["admin"],
+    dependencies=[Depends(token_auth_scheme)], # Admin routes need token (and role check inside)
+)

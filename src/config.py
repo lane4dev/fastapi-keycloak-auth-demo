@@ -10,6 +10,12 @@ class Settings(BaseSettings):
 
     secret_key: str = "super_secretkey"
 
+    keycloak_realm: str = None
+    keycloak_auth_server_url: str = None
+    keycloak_client_id: str = None
+    keycloak_secret: str = None
+    keycloak_cookie_key: str = None
+
     class Config:
         env_file = ".env"
 
