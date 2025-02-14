@@ -1,0 +1,58 @@
+services:
+  keycloak:
+    image: quay.io/keycloak/keycloak:22.0.1
+    ports:
+      - 8080:8080
+    environment:
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+      KC_DB: dev-file
+      KC_HEALTH_ENABLED: true
+      KC_METRICS_ENABLED: true
+      KC_HTTP_ENABLED: true # 如果本地开发不使用 HTTPS，则启用 HTTP
+    command:
+      - start-dev --hostname-strict=false
+    volumes:
+      - keycloak_data:/opt/keycloak/data
+    healthcheck:
+      test: ["CMD-SHELL", "exec 3<>/dev/tcp/127.0.0.1/8080 || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    networks:
+      - app-network
+
+  fastapi-app:
+    image: fastapi-keycloak-auth-demo:latest
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    ports:
+      - 8000:8000
+    environment:
+      NODE_ENV: production
+      KEYCLOAK_AUTH_SERVER_URL: http://keycloak:8080
+      KEYCLOAK_REALM: dev
+      KEYCLOAK_CLIENT_ID: backend-api-demo
+      KEYCLOAK_SECRET: k7J3qaClToKHHlDERTDoVzgdLNvJz1IQ
+      KEYCLOAK_COOKIE_KEY: KEYCLOAK_JWT
+    depends_on:
+      keycloak:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8000/api/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+volumes:
+  keycloak_data:
+
+networks:
+  app-network:
+    driver: bridge
